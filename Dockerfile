@@ -1,5 +1,6 @@
 FROM registry.redhat.io/ubi10/ubi-minimal:latest
 
+ARG TARGETARCH
 USER root
 
 # Copy repo content
@@ -11,10 +12,6 @@ RUN microdnf install -y subscription-manager
 RUN --mount=type=secret,id=org-id --mount=type=secret,id=activation-key subscription-manager register --activationkey=$(cat /run/secrets/activation-key) --org=$(cat /run/secrets/org-id)
 RUN subscription-manager repos --enable=codeready-builder-for-rhel-10-$(arch)-rpms
 #======================================================
-
-# Install AWS CLI for in-container debugging
-RUN microdnf install -y awscli unzip \
-    && microdnf clean all
 
 RUN rm -f /etc/yum.repos.d/ubi.repo
 COPY ceph.repo /etc/yum.repos.d
